@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Study Plan</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+
+        <h2 class="text-center text-success mb-4">
+            📊 Your Study Plan
+        </h2>
+
+        <p class="text-center">
+            Days Available:
+            <span class="badge bg-primary">{{ total_days }}</span>
+        </p>
+
+        <table class="table table-striped mt-4">
+            <thead class="table-dark">
+                <tr>
+                    <th>Subject</th>
+                    <th>Daily Hours Allocated</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in plans %}
+                <tr>
+                    <td>{{ p.subject }}</td>
+                    <td>{{ p.allocated_hours }} hrs</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <hr class="mt-5">
+
+        <h4 class="text-center mt-4">⏳ Pomodoro Focus Timer</h4>
+
+        <div class="text-center mt-3">
+            <h1 id="timer" class="display-4 text-danger">25:00</h1>
+            <p id="mode" class="fw-bold">Focus Time</p>
+
+            <div class="mt-3">
+                <button class="btn btn-success me-2" onclick="startTimer()">Start</button>
+                <button class="btn btn-warning me-2" onclick="pauseTimer()">Pause</button>
+                <button class="btn btn-danger" onclick="resetTimer()">Reset</button>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="/" class="btn btn-secondary">Plan Again</a>
+        </div>
+
+    </div>
+</div>
+
+<script>
+let timer;
+let timeLeft = 25 * 60;
+let isRunning = false;
+let isFocus = true;
+
+function updateDisplay() {
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+
+    document.getElementById("timer").innerText =
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function startTimer() {
+    if (isRunning) return;
+    isRunning = true;
+
+    timer = setInterval(() => {
+        if (timeLeft > 0) {
+            timeLeft--;
+            updateDisplay();
+        } else {
+            clearInterval(timer);
+            isRunning = false;
+
+            if (isFocus) {
+                alert("Focus complete! Take 5 min break.");
+                timeLeft = 5 * 60;
+                document.getElementById("mode").innerText = "Break Time";
+                document.getElementById("timer").classList.replace("text-danger", "text-success");
+            } else {
+                alert("Break over! Back to focus.");
+                timeLeft = 25 * 60;
+                document.getElementById("mode").innerText = "Focus Time";
+                document.getElementById("timer").classList.replace("text-success", "text-danger");
+            }
+
+            isFocus = !isFocus;
+            updateDisplay();
+        }
+    }, 1000);
+}
+
+function pauseTimer() {
+    clearInterval(timer);
+    isRunning = false;
+}
+
+function resetTimer() {
+    clearInterval(timer);
+    isRunning = false;
+    isFocus = true;
+    timeLeft = 25 * 60;
+    document.getElementById("mode").innerText = "Focus Time";
+    document.getElementById("timer").classList.replace("text-success", "text-danger");
+    updateDisplay();
+}
+
+updateDisplay();
+</script>
+
+</body>
+</html>
